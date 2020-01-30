@@ -324,6 +324,7 @@ class ThroughputTracker(Callback):
         self._samples_per_step = samples_per_step
         self._timer = Timer()
         self._timer.pause()
+        self._total_seconds = 0.0
 
     # only include the time between before_epoch/after_epoch
     def _before_epoch(self):
@@ -350,3 +351,10 @@ class ThroughputTracker(Callback):
             self.trainer.monitors.put_scalar("Throughput (steps/sec)", steps_per_sec)
         else:
             self.trainer.monitors.put_scalar("Throughput (samples/sec)", steps_per_sec * self._samples_per_step)
+    
+    def _after_train(self):
+        avg_steps_per_sec = self.global_step / self._total_seconds
+        if self._samples_per_step is None:
+            self.trainer.monitors.put_scalar("Average Throughput (steps/sec)", avg_steps_per_sec)
+        else:
+            self.trainer.monitors.put_scalar("Average Throughput (samples/sec)", avg_steps_per_sec * self._samples_per_step)
