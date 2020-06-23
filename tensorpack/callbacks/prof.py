@@ -338,6 +338,7 @@ class ThroughputTracker(Callback):
 
     def _update_last(self):
         old_pause = self._timer.is_paused()
+        self._total_seconds += self._timer.seconds()
         self._timer.reset()
         if old_pause:
             self._timer.pause()
